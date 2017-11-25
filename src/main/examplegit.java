@@ -5,6 +5,10 @@ public class examplegit {
 		System.out.println("testest");
 		System.out.println("test2");
 		System.out.println("test3");
+		System.out.println("test2");
+		System.out.println("test2");
+		System.out.println("test2");
+		System.out.println("test2");
 	}
 	
 }
