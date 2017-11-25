@@ -1,5 +1,8 @@
 package main;
 
 public class examplegit {
-	//example111
+	public void ex() {
+		System.out.println("testest");
+	}
+	
 }
