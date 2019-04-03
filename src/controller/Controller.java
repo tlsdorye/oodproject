@@ -42,14 +42,17 @@ public class Controller {
 		soloGameBoard.startSoloGame();
 		totalFrame.showSoloGamePanel();
 	}
+	
+	/** AI Game 을 시작합니다. */
+	public void startAIGame() {
+		init();
+		gameMode = 3;
+		soloGameBoard.startTempAIGame();
+		totalFrame.showSoloGamePanel();
+	}
 
 	/** 2P Game 을 시작합니다. */
 	public void start2PGame() {
-
-	}
-
-	/** AI Game 을 시작합니다. */
-	public void startAIGame() {
 
 	}
 

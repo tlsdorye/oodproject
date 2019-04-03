@@ -18,6 +18,7 @@ public class BlockJ extends Block {
 	public BlockJ(GameBoardSolo gameBoard) {
 		super(gameBoard);
 		initShape();
+		blockIndex = 4;
 	}
 
 	/** Block 의 모양을 결정합니다. */

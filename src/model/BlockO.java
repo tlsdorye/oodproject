@@ -19,6 +19,7 @@ public class BlockO extends Block {
 	public BlockO(GameBoardSolo gameBoard) {
 		super(gameBoard);
 		initShape();
+		blockIndex = 6;
 	}
 
 	/** Block 의 모양을 결정합니다. */

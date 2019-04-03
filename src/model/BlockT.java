@@ -19,6 +19,7 @@ public class BlockT extends Block {
 	public BlockT(GameBoardSolo gameBoard) {
 		super(gameBoard);
 		initShape();
+		blockIndex = 5;
 	}
 
 	/** Block 의 모양을 결정합니다. */

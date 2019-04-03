@@ -18,11 +18,15 @@ public abstract class Block {
 	/** topLeftPoint의 값을 임시로 저장할 변수입니다. */
 	protected Point tempTopLeftPoint;
 	/** Block의 위치를 저장할 Point Type Array 변수입니다. */
+	protected Point beforeTopLeftPoint;
+	
 	protected Point[] coord;
 	/** coord의 값을 임시로 저장할 변수입니다. */
 	protected Point[] tempCoord;
 	/** Block 의 색을 담는 변수입니다. */
 	protected Color color;
+	
+	public int blockIndex;
 
 	/**
 	 * Block 을 생성합니다.
@@ -76,6 +80,7 @@ public abstract class Block {
 	 */
 	public void setTopLeftPoint(Point topLeftPoint) {
 		this.topLeftPoint = topLeftPoint;
+		
 	}
 
 	/**
@@ -126,6 +131,20 @@ public abstract class Block {
 		return false;
 	}
 
+	/**
+	 * Block 아래로 한칸 내릴 수 있는지 확인합니다.
+	 * 
+	 * @return 아래로 한칸 이동할 수 있다면 true를, 없다면 false를 반환합니다.
+	 */
+	public boolean isMoveDown() {
+		Point x = new Point(topLeftPoint.getX() + 1, topLeftPoint.getY());
+		gameBoard.revertMatrix();
+		if (!isCollisionMove(x))
+			return true;
+		else
+			return false;
+	}
+	
 	/** Block 회전을 실행합니다. */
 	public void performSpin() { // 블록 스핀하기
 		gameBoard.revertMatrix();
@@ -139,6 +158,7 @@ public abstract class Block {
 				tempCoord[i].setY(coord[i].getY());
 			}
 		}
+		gameBoard.update();
 	}
 
 	/** Block 을 왼쪽으로 이동합니다. */
@@ -153,6 +173,7 @@ public abstract class Block {
 			topLeftPoint.setY(tempTopLeftPoint.getY() + 1);
 			changeCoord();
 		}
+		gameBoard.update();
 	}
 
 	/** Block 을 오른쪽으로 이동합니다. */
@@ -167,47 +188,14 @@ public abstract class Block {
 			topLeftPoint.setY(tempTopLeftPoint.getY() - 1);
 			changeCoord();
 		}
+		gameBoard.update();
 	}
 
 	/** Block 을 아래로 이동합니다. */
 	public void moveDown() {
 		tempTopLeftPoint.setX(topLeftPoint.getX() + 1);
-		gameBoard.revertMatrix();
-		if (!isCollisionMove(tempTopLeftPoint)) {
-			setTopLeftPoint(tempTopLeftPoint);
-			changeCoord();
-		} else {
-			topLeftPoint.setX(tempTopLeftPoint.getX() - 1);
-			changeCoord();
-			fixedAndSetNextBlock();
-		}
-	}
-
-	/**
-	 * Block 아래로 한칸 내릴 수 있는지 확인합니다.
-	 * 
-	 * @return 아래로 한칸 이동할 수 있다면 true를, 없다면 false를 반환합니다.
-	 */
-	public boolean isMoveDown() {
-		Point x = new Point(topLeftPoint.getX() + 1, topLeftPoint.getY());
-		gameBoard.revertMatrix();
-		if (!isCollisionMove(x))
-			return true;
-		else
-			return false;
-	}
-
-	/** Block 을 바로 떨어트립니다. */
-	public void fastDown() {
-		while (isMoveDown())
-			moveDown();
-		changeCoord();
-		fixedAndSetNextBlock();
-	}
-
-	/** Block 을 한칸 떨어트립니다. */
-	public void drop() {
-		tempTopLeftPoint.setX(topLeftPoint.getX() + 1);
+		tempTopLeftPoint.setY(topLeftPoint.getY());
+		//System.out.println(tempTopLeftPoint.getX()+" "+tempTopLeftPoint.getY());
 		gameBoard.revertMatrix();
 		if (!isCollisionMove(tempTopLeftPoint)) {
 			setTopLeftPoint(tempTopLeftPoint);
@@ -219,5 +207,94 @@ public abstract class Block {
 		}
 		gameBoard.update();
 	}
+
+	/** Block 을 바로 떨어트립니다. */
+	public void fastDown() {
+		
+		while (isMoveDown())
+			moveDown();
+		changeCoord();
+		fixedAndSetNextBlock();
+		gameBoard.update();
+	}
+
+	/** Block 을 한칸 떨어트립니다. */
+	public void drop() {
+		tempTopLeftPoint.setX(topLeftPoint.getX() + 1);
+		tempTopLeftPoint.setY(topLeftPoint.getY());
+		gameBoard.revertMatrix();
+		if (!isCollisionMove(tempTopLeftPoint)) {
+			setTopLeftPoint(tempTopLeftPoint);
+			changeCoord();
+		} else {
+			topLeftPoint.setX(tempTopLeftPoint.getX() - 1);
+			changeCoord();
+			fixedAndSetNextBlock();
+		}
+		gameBoard.update();
+	}
+	
+	public void AIPerformSpin() {
+		gameBoard.revertMatrix();
+		if (!isCollisionSpin(topLeftPoint)) {
+			spinnable.spin(coord);
+		} else {
+			changeCoord();
+			for (int i = 0; i < coord.length; i++) {
+				tempCoord[i].setX(coord[i].getX());
+				tempCoord[i].setY(coord[i].getY());
+			}
+		}
+	}
+	
+	public int AIMoveLeft() {
+		tempTopLeftPoint.setY(topLeftPoint.getY() - 1);
+		tempTopLeftPoint.setX(topLeftPoint.getX());
+		gameBoard.revertMatrix();
+		if (!isCollisionMove(tempTopLeftPoint)) {
+			setTopLeftPoint(tempTopLeftPoint);
+			changeCoord();
+			return 1;
+		} else {
+			topLeftPoint.setY(tempTopLeftPoint.getY() + 1);
+			changeCoord();
+			return 0;
+		}
+	}
+	
+	public int AIMoveRight() {
+		tempTopLeftPoint.setY(topLeftPoint.getY() + 1);
+		tempTopLeftPoint.setX(topLeftPoint.getX());
+		gameBoard.revertMatrix();
+		if (!isCollisionMove(tempTopLeftPoint)) {
+			setTopLeftPoint(tempTopLeftPoint);
+			changeCoord();
+			return 1;
+		} else {
+			topLeftPoint.setY(tempTopLeftPoint.getY() - 1);
+			changeCoord();
+			return 0;
+		}
+	}
+	
+	public void AIMoveDown() {
+		tempTopLeftPoint.setX(topLeftPoint.getX() + 1);
+		tempTopLeftPoint.setY(topLeftPoint.getY());
+		gameBoard.revertMatrix();
+		if (!isCollisionMove(tempTopLeftPoint)) {
+			setTopLeftPoint(tempTopLeftPoint);
+			changeCoord();
+		} else {
+			topLeftPoint.setX(tempTopLeftPoint.getX() - 1);
+			changeCoord();
+		}
+	}
+	
+	public void AIFastDown() {
+		while (isMoveDown())
+			AIMoveDown();
+		changeCoord();
+	}
+	
 
 }

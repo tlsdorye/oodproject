@@ -140,7 +140,7 @@ public class ViewGameModePanel extends JPanel implements IViewPanel {
 					show2PGamePanel();
 				}
 				if (e.getSource() == AIGamebt) {
-					showAIGamePanel();
+					totalFrame.AIGameStart();
 				}
 				if (e.getSource() == backbt) {
 					showMainPanel();

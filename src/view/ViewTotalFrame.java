@@ -95,7 +95,6 @@ public class ViewTotalFrame extends JFrame {
 					spin();
 				}
 				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-					System.out.println("Asdasd");
 					fastDown();
 				}
 			}
@@ -146,6 +145,7 @@ public class ViewTotalFrame extends JFrame {
 	/** AIGame을 시작합니다. */
 	public void AIGameStart() {
 		addKeyListener();
+		controller.startAIGame();
 	}
 
 	/** 화면을 repaint 합니다. */
@@ -169,12 +169,13 @@ public class ViewTotalFrame extends JFrame {
 
 	/** 2PGame을 종료합니다. */
 	public void ZPGameLose() {
-
+		
 	}
 
 	/** AIGame을 종료합니다. */
 	public void AIGameLose() {
-
+		removeKeyListener(keyListener);
+		soloGamePanel.gameOver();
 	}
 
 	/** MainPanel을 보여줍니다. */

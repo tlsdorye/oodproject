@@ -19,6 +19,7 @@ public class BlockS extends Block {
 	public BlockS(GameBoardSolo gameBoard) {
 		super(gameBoard);
 		initShape();
+		blockIndex = 0;
 	}
 
 	/** Block 의 모양을 결정합니다. */

@@ -23,17 +23,17 @@ public class GameBoardSolo implements Runnable {
 	/** Block의 최대 개수를 나타낼 변수입니다. */
 	public static final int BLOCK_MAX_NUM = 4;
 	/** 명령을 받거나 전달할 Controller Type 변수입니다. */
-	private Controller controller;
+	protected Controller controller;
 	/** 현재 Block을 저장할 변수입니다. */
-	private Block currentBlock;
+	protected Block currentBlock;
 	/** 다음 Block을 저장할 변수입니다. */
-	private Block nextBlock;
+	protected Block nextBlock;
 	/** GameBoard를 저장할 2차원배열입니다. */
-	private int[][] Board;
+	protected int[][] Board;
 	/** Board의 값을 임시로 저장할 변수입니다. */
-	private int[][] tempBoard;
+	protected int[][] tempBoard;
 	/** 다음 블럭을 화면에 표시해줄 영역 입니다. */
-	private int[][] NextBlockBoard;
+	protected int[][] NextBlockBoard;
 	/** 점수를 저장할 변수입니다. */
 	private int score;
 	/** Level을 저장할 변수입니다. */
@@ -48,6 +48,10 @@ public class GameBoardSolo implements Runnable {
 	private double playTime;
 	/** Pause를 시작한 시간, 총 Pause된 시간을 저장할 변수입니다. */
 	private long startPauseTime, pauseTime;
+	
+	private AIBehavior AIbehavior;
+	protected int gameMode;
+	private int timer;
 
 	/**
 	 * GameBoardSolo 를 생성합니다.
@@ -76,8 +80,20 @@ public class GameBoardSolo implements Runnable {
 		setCurrentBlock();
 	}
 
+	Thread t;
 	/** Solo Game 을 시작합니다. */
 	public void startSoloGame() {
+		t = new Thread(this);
+		gameMode = 1;
+		timer = 0;
+		t.start();
+		setStartTime();
+	}
+	
+	public void startTempAIGame() {
+		AIbehavior = new AIBehavior(this);
+		gameMode = 3;
+		timer = 0;
 		Thread t = new Thread(this);
 		t.start();
 		setStartTime();
@@ -89,11 +105,18 @@ public class GameBoardSolo implements Runnable {
 	 */
 	@Override
 	public void run() {
+		controller.update();
 		while (true) {
-			if (start)
-				drop();
-			setLevel();
-			sleep();
+			if (start) {
+				if(gameMode==1) {
+					setLevel();
+					sleep();
+				}
+				if(gameMode==3) {
+					setLevel();
+					sleep();
+				}
+			}
 		}
 	}
 
@@ -133,7 +156,21 @@ public class GameBoardSolo implements Runnable {
 		if (level == 10)
 			speed = 90;
 		try {
-			Thread.sleep(speed);
+			Thread.sleep(10);
+			timer += 10;
+			if(timer == speed) {
+				//currentBlock.AIMoveDown();
+				//AIbehavior.setBeforeHeight();
+				//AIbehavior.setNextHeight();
+				//AIbehavior.setVarHeight();
+				
+				//AIbehavior.setEmptySpace();
+				//AIbehavior.setBlockAndWallCS();
+				AIbehavior.setBestPoint();
+				//drop();
+				//AIbehavior.circul();
+				timer = 0;
+			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -217,10 +254,15 @@ public class GameBoardSolo implements Runnable {
 	public void fastDown() {
 		currentBlock.fastDown();
 	}
+	
+	public void AIfastDown() {
+		currentBlock.AIFastDown();
+	}
 
 	/** Controller의 update 메소드를 실행합니다. */
 	public void update() {
-		controller.update();
+		if(gameMode != 4)
+			controller.update();
 	}
 
 	/** Game 을 Pause 합니다. */
@@ -410,18 +452,23 @@ public class GameBoardSolo implements Runnable {
 	/** Block을 Board에 고정시키고, 다음 Block을 설정합니다. */
 	public void fixedAndSetNextBlock() {
 		clear();
-		for (int i = 0; i < Board.length; i++)
-			for (int j = 0; j < Board[i].length; j++)
-				tempBoard[i][j] = Board[i][j];
+		fixedBlock();
 		if (isGameOver())
 			GameOver();
 		setCurrentBlock();
+	}
+	
+	public void fixedBlock() {
+		for (int i = 0; i < Board.length; i++)
+			for (int j = 0; j < Board[i].length; j++)
+				tempBoard[i][j] = Board[i][j];
 	}
 
 	/** Game Over시 호출됩니다. */
 	public void GameOver() {
 		start = false;
-		controller.soloGameOver();
+		if(gameMode != 4)
+			controller.soloGameOver();
 	}
 
 	/**
